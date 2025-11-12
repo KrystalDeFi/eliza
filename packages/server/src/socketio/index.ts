@@ -23,7 +23,8 @@ export class SocketIORouter {
     this.connections = new Map();
     this.logStreamConnections = new Map();
     this.serverInstance = serverInstance;
-    logger.info(`[SocketIO] Router initialized with ${this.elizaOS.getAgents().length} agents`);
+    const serverAuthToken = process.env.ELIZA_SERVER_AUTH_TOKEN;
+    logger.info(`[SocketIO] Router initialized with ${this.elizaOS.getAgents().length} agents. Server auth token: ${serverAuthToken}`);
   }
 
   setupListeners(io: SocketIOServer) {
