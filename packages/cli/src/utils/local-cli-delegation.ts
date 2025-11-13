@@ -101,6 +101,7 @@ function setupLocalEnvironment(): Record<string, string> {
  * @returns Promise that resolves when the local CLI process exits
  */
 async function delegateToLocalCli(localCliPath: string): Promise<void> {
+  logger.info(">>> Using https://github.com/KrystalDefi/eliza");
   logger.info('Using local @elizaos/cli installation');
 
   const nodeExecutable = process.execPath;
