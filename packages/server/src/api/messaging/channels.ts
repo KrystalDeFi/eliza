@@ -245,7 +245,7 @@ export function createChannelsRouter(
           source_id: createdRootMessage.sourceId, // Will be undefined here, which is fine
         };
 
-        internalMessageBus.emit('new_message', messageForBus);
+        // internalMessageBus.emit('new_message', messageForBus);
         logger.info(
           '[Messages Router /central-channels/:channelId/messages] GUI Message published to internal bus:',
           messageForBus.id
