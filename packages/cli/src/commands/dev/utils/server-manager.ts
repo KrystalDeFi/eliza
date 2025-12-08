@@ -98,6 +98,7 @@ async function startServerProcess(args: string[] = []): Promise<void> {
 
   let scriptPath: string;
   if (localCliPath) {
+    console.info("Using https://github.com/KrystalDefi/eliza")
     console.info('Using local @elizaos/cli installation');
     scriptPath = localCliPath;
   } else {
