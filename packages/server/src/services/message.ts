@@ -605,7 +605,7 @@ export class MessageBusService extends Service {
       // Check if this memory already exists (in case of duplicate processing)
       const existingMemory = await this.runtime.getMemoryById(uniqueMemoryId);
       if (existingMemory) {
-        logger.debug(
+        logger.info(
           { src: 'service:message-bus', agentId: this.runtime.agentId, memoryId: uniqueMemoryId },
           'Memory already exists, skipping duplicate'
         );
