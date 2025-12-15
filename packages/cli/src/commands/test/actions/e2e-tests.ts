@@ -70,7 +70,7 @@ export async function runE2eTests(
       console.info(`Cleaning up existing database directory: ${elizaDbDir}`);
       try {
         fs.rmSync(elizaDbDir, { recursive: true, force: true });
-        console.info(`Successfully cleaned up existing database directory`);
+        console.info('Successfully cleaned up existing database directory');
       } catch (error) {
         console.warn(`Failed to clean up existing database directory: ${error}`);
         // Continue anyway, the initialization might handle it
@@ -232,7 +232,12 @@ export async function runE2eTests(
             // Use AgentServer's startAgents method with the plugin under test
             // isTestMode: true ensures testDependencies are loaded
             const startedRuntimes = await server.startAgents(
-              [defaultElizaCharacter],
+              [
+                {
+                  character: defaultElizaCharacter,
+                  plugins: [pluginUnderTest],
+                },
+              ],
               [pluginUnderTest], // Pass the local plugin module directly
               { isTestMode: true }
             );
@@ -421,7 +426,7 @@ export async function runE2eTests(
           if (fs.existsSync(elizaDbDir)) {
             console.info(`Cleaning up test database directory: ${elizaDbDir}`);
             fs.rmSync(elizaDbDir, { recursive: true, force: true });
-            console.info(`Successfully cleaned up test database directory`);
+            console.info('Successfully cleaned up test database directory');
           }
           // Also clean up the parent test directory if it's empty
           const testDir = path.dirname(elizaDbDir);
