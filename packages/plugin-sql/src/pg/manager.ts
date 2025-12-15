@@ -10,7 +10,12 @@ export class PostgresConnectionManager {
   constructor(connectionString: string, rlsServerId?: string) {
     // If RLS is enabled, set application_name to the server_id
     // This allows the RLS function current_server_id() to read it
-    const poolConfig: PoolConfig = { connectionString, idleTimeoutMillis: 0 };
+    const poolConfig: PoolConfig = {
+      connectionString,
+      max: 20,
+      idleTimeoutMillis: 40000,
+      connectionTimeoutMillis: 2000,
+    };
 
     if (rlsServerId) {
       poolConfig.application_name = rlsServerId;
