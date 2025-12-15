@@ -84,7 +84,6 @@ export class PgDatabaseAdapter extends BaseDrizzleAdapter {
   protected async withDatabase<T>(operation: () => Promise<T>): Promise<T> {
     return await this.withRetry(async () => {
       const client = await this.manager.getClient();
-      const thisDB = this.db;
       try {
         // Cast to any to avoid type conflicts between different pg versions
         const db = drizzle(client as any);
@@ -92,7 +91,6 @@ export class PgDatabaseAdapter extends BaseDrizzleAdapter {
 
         return await operation();
       } finally {
-        this.db = thisDB;
         client.release();
       }
     });
