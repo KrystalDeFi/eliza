@@ -82,18 +82,7 @@ export class PgDatabaseAdapter extends BaseDrizzleAdapter {
    * @returns {Promise<T>} A promise that resolves with the result of the operation.
    */
   protected async withDatabase<T>(operation: () => Promise<T>): Promise<T> {
-    return await this.withRetry(async () => {
-      const client = await this.manager.getClient();
-      try {
-        // Cast to any to avoid type conflicts between different pg versions
-        const db = drizzle(client as any);
-        this.db = db;
-
-        return await operation();
-      } finally {
-        client.release();
-      }
-    });
+    return this.withRetry(operation);
   }
 
   /**
