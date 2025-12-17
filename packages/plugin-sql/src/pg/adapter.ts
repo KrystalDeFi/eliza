@@ -1,5 +1,4 @@
 import { type UUID, logger, Agent, Entity, Memory, Component } from '@elizaos/core';
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { BaseDrizzleAdapter } from '../base';
 import { DIMENSION_MAP, type EmbeddingDimensionColumn } from '../schema/embedding';
 import type { PostgresConnectionManager } from './manager';
