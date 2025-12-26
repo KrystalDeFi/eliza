@@ -303,6 +303,19 @@ export async function generateMigrationSQL(
     statements.push(`DROP TABLE IF EXISTS "${schema}"."${name}" CASCADE;`);
   }
 
+  // IMPORTANT: Drop foreign keys BEFORE dropping columns
+  // This prevents errors when columns are renamed (seen as delete + add)
+  // and foreign keys reference the old column name
+  // Handle foreign key deletions first (including altered ones)
+  for (const fk of diff.foreignKeys.deleted) {
+    statements.push(generateDropForeignKeySQL(fk));
+  }
+
+  // Drop old version of altered foreign keys
+  for (const alteredFK of diff.foreignKeys.altered) {
+    statements.push(generateDropForeignKeySQL(alteredFK.old));
+  }
+
   // Generate ALTER TABLE statements for column changes
   // Handle column additions
   for (const added of diff.columns.added) {
@@ -390,16 +403,6 @@ export async function generateMigrationSQL(
   // Generate DROP CHECK CONSTRAINT statements
   for (const constraint of diff.checkConstraints.deleted) {
     statements.push(generateDropCheckConstraintSQL(constraint));
-  }
-
-  // Handle foreign key deletions first (including altered ones)
-  for (const fk of diff.foreignKeys.deleted) {
-    statements.push(generateDropForeignKeySQL(fk));
-  }
-
-  // Drop old version of altered foreign keys
-  for (const alteredFK of diff.foreignKeys.altered) {
-    statements.push(generateDropForeignKeySQL(alteredFK.old));
   }
 
   // Handle foreign key creations (for existing tables)
@@ -814,7 +817,9 @@ function generateDropForeignKeySQL(fk: any): string {
       ? fk.tableFrom.split('.')
       : ['public', fk.tableFrom]
     : ['public', ''];
-  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT "${fk.name}";`;
+  // Use IF EXISTS to prevent errors when constraint doesn't exist
+  // This can happen when columns are renamed and FKs are dropped via CASCADE
+  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT IF EXISTS "${fk.name}";`;
 }
 
 /**
