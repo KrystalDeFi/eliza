@@ -641,6 +641,7 @@ export async function migrateToEntityRLS(adapter: IDatabaseAdapter): Promise<voi
       { table: 'tasks', from: 'roomId', to: 'room_id' },
       { table: 'tasks', from: 'worldId', to: 'world_id' },
       { table: 'tasks', from: 'entityId', to: 'entity_id' },
+      { table: 'tasks', from: 'agentId', to: 'agent_id' },
       { table: 'tasks', from: 'createdAt', to: 'created_at' },
       { table: 'tasks', from: 'updatedAt', to: 'updated_at' },
 
