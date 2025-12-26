@@ -573,7 +573,7 @@ function generateDropColumnSQL(table: string, column: string): string {
   const [schema, tableName] = table.includes('.') ? table.split('.') : ['public', table];
   const tableNameWithSchema = `"${schema}"."${tableName}"`;
   // Use CASCADE to handle dependent objects
-  return `ALTER TABLE ${tableNameWithSchema} DROP COLUMN "${column}" CASCADE;`;
+  return `ALTER TABLE ${tableNameWithSchema} DROP COLUMN IF EXISTS "${column}" CASCADE;`;
 }
 
 /**
@@ -868,7 +868,7 @@ function generateDropUniqueConstraintSQL(constraint: any): string {
   const table = constraint.table || '';
   const [schema, tableName] = table.includes('.') ? table.split('.') : ['public', table];
 
-  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT "${constraint.name}";`;
+  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT IF EXISTS "${constraint.name}";`;
 }
 
 /**
@@ -891,5 +891,5 @@ function generateDropCheckConstraintSQL(constraint: any): string {
   const table = constraint.table || '';
   const [schema, tableName] = table.includes('.') ? table.split('.') : ['public', table];
 
-  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT "${constraint.name}";`;
+  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT IF EXISTS "${constraint.name}";`;
 }
