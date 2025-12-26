@@ -814,9 +814,7 @@ function generateDropForeignKeySQL(fk: any): string {
       ? fk.tableFrom.split('.')
       : ['public', fk.tableFrom]
     : ['public', ''];
-  // Use IF EXISTS to prevent errors when constraint doesn't exist
-  // This can happen when columns are renamed and FKs are dropped via CASCADE
-  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT IF EXISTS "${fk.name}";`;
+  return `ALTER TABLE "${schema}"."${tableName}" DROP CONSTRAINT "${fk.name}";`;
 }
 
 /**
