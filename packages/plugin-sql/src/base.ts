@@ -38,7 +38,7 @@ import {
   SQL,
   sql,
 } from 'drizzle-orm';
-import { v4 } from 'uuid';
+import { v4, v5 } from 'uuid';
 import { DIMENSION_MAP, type EmbeddingDimensionColumn } from './schema/embedding';
 import {
   agentTable,
@@ -3417,7 +3417,7 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<any> {
       };
 
       await this.db.transaction(async (tx) => {
-        await tx.insert(channelTable).values(channelToInsert);
+        await tx.insert(channelTable).values(channelToInsert).onConflictDoNothing();
 
         if (participantIds && participantIds.length > 0) {
           const participantValues = participantIds.map((entityId) => ({
@@ -3428,7 +3428,25 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<any> {
         }
       });
 
-      return channelToInsert;
+      // Re-fetch to get actual data (handles race condition where another process inserted first)
+      const [channel] = await this.db
+        .select()
+        .from(channelTable)
+        .where(eq(channelTable.id, newId))
+        .limit(1);
+
+      return {
+        id: channel.id as UUID,
+        messageServerId: channel.messageServerId as UUID,
+        name: channel.name,
+        type: channel.type,
+        sourceType: channel.sourceType || undefined,
+        sourceId: channel.sourceId || undefined,
+        topic: channel.topic || undefined,
+        metadata: channel.metadata || undefined,
+        createdAt: channel.createdAt,
+        updatedAt: channel.updatedAt,
+      };
     });
   }
 
@@ -3890,6 +3908,10 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<any> {
       const ids = [user1Id, user2Id].sort();
       const dmChannelName = `DM-${ids[0]}-${ids[1]}`;
 
+      // Generate deterministic channel ID from the 3 params to avoid race conditions
+      const channelId = v5(`${ids[0]}-${ids[1]}-${messageServerId}`, v5.DNS) as UUID;
+
+      // Keep original query for backward compatibility with existing random-ID channels
       const existingChannels = await this.db
         .select()
         .from(channelTable)
@@ -3917,9 +3939,10 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<any> {
         };
       }
 
-      // Create new DM channel
+      // Create new DM channel with deterministic ID
       return this.createChannel(
         {
+          id: channelId,
           messageServerId,
           name: dmChannelName,
           type: ChannelType.DM,
