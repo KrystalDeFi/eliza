@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import type { Metadata } from '@elizaos/core';
 import { agentTable } from './agent';
 
 /**
@@ -10,7 +11,7 @@ import { agentTable } from './agent';
  * @property {string} agentId - The UUID of the agent associated with the room.
  * @property {string} source - The source of the room.
  * @property {string} type - The type of the room.
- * @property {string} serverId - The server ID of the room.
+ * @property {string} messageServerId - The message server ID of the room.
  * @property {string} worldId - The UUID of the world associated with the room.
  * @property {string} name - The name of the room.
  * @property {object} metadata - Additional metadata for the room in JSON format.
@@ -33,7 +34,7 @@ export const roomTable = pgTable('rooms', {
   //   onDelete: 'cascade',
   // }),
   name: text('name'),
-  metadata: jsonb('metadata'),
+  metadata: jsonb('metadata').$type<Metadata>(),
   channelId: text('channel_id'),
   createdAt: timestamp('created_at')
     .default(sql`now()`)
